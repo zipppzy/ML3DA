@@ -2,6 +2,8 @@
 import random
 import math
 import unittest
+import turtle
+import time
 from operator import attrgetter
 class Neuron:
 	def __init__(self,inputs):
@@ -15,8 +17,8 @@ class Neuron:
 		for x in range(len(inputs)-1):
 			self.sum+=inputs[x]*self.weights[x]
 		self.activation=self.sum
-		def setWeights(self,weights):
-			self.inputWeights=weights
+	def setWeights(self,weights):
+		self.inputWeights=weights
 class Layer:
 	def __init__(self,i,nN):
 		self.layerArr=[]
@@ -47,36 +49,25 @@ class NeuralNet:
 		global point2
 		self.neuralNet=[]
 		self.inputs=inputs
-		#making first layer with initial inputs; random weights
 		self.neuralNet.append(Layer(self.inputs,netStructArr[0]))
-		#make the rest of the layers using the output of the first
 		for i in range(1,len(netStructArr)):
 			self.neuralNet.append(Layer(self.neuralNet[i-1].getOutput(),netStructArr[i]))
 		self.output=self.neuralNet[len(self.neuralNet)-1].getOutput()
 		#fitness function is distance from point 2 after moving
-		self.fitness=test(self)
+		testPoint=Point(point1.x+self.output[0],point1.y+self.output[1])
+		self.fitness=testPoint.vector(point2)[0]
 		self.weights=[]
 		for i in self.neuralNet:
 			self.weights.append(i.getWeights())
 
-	def setInputs(self,inputs){
-		weights=getWeights()
-		self.inputs=inputs
-		self.neuralNet=[]
-		self.neuralNet.append(Layer(self.inputs,netStructArr[0]))
-		#make the rest of the layers using the output of the first
-		for i in range(1,len(netStructArr)):
-			self.neuralNet.append(Layer(self.neuralNet[i-1].getOutput(),netStructArr[i]))
-		self.output=self.neuralNet[len(self.neuralNet)-1].getOutput()
-	}
+	
 	def setWeights(self,w):
+		#resolve problems here
 		for i in range(len(self.neuralNet)):
-			self.neuralNet[i].setWeights(w[i])
-	def getWeights(self){
-		weights=[]
-		for i in self.neuralNet:
-			self.weights.append(i.getWeights)
-	}
+			self.neuralNet[i]=w[i]
+		#for i in self.neuralNet:
+		#	i.setWeights(w)
+	
 		
 
 class Point:
@@ -89,6 +80,7 @@ class Point:
 		v.append(math.sqrt(((a.x-self.x)**2)+((a.y-self.y)**2)))
 		v.append(math.atan2(a.x-self.x,a.y-self.y))
 		return v		
+#creates an array of NeuralNets
 def generate(numInd,netStruct):
 	global inputs
 	generation=[]
@@ -98,18 +90,30 @@ def generate(numInd,netStruct):
 def cullTheWeak(gen,surviorNum):
 	culledGen=sorted(gen,key=attrgetter('fitness'))
 	culledGen=culledGen[:surviorNum]
-	culledGen.reverse()
+	
 	return culledGen
 
 #return 4 weights for neural Nets
 def reproduce(neuralNet1,neuralNet2):
-	randVal=math.floor(random.random()*(len(neuralNet1.getWeights())))
-	piece1=neuralNet1.getWeights()[:randVal]
-	piece2=neuralNet1.getWeights()[randVal:len(neuralNet1.getWeights())]
-	piece3=neuralNet2.getWeights()[:randVal]
-	piece4=neuralNet2.getWeights()[randVal:len(neuralNet1.getWeights())]
+	randVal=math.floor(random.random()*(len(neuralNet1.weights)))
+	piece1=neuralNet1.weights[:randVal]
+	piece2=neuralNet1.weights[randVal:len(neuralNet1.weights)]
+	piece3=neuralNet2.weights[:randVal]
+	piece4=neuralNet2.weights[randVal:len(neuralNet1.weights)]
 	return [piece1+piece4,piece2+piece3]
 
+def reset():
+	global turnt
+	turnt.reset()
+	turnt.speed(10)
+	turnt.pensize(8)
+	turnt.penup()
+	turnt.goto(point1.x,point1.y)
+	turnt.dot(15,"green")
+	turnt.goto(point2.x,point2.y)
+	turnt.dot(15,"red")
+	turnt.goto(point1.x,point1.y)
+	turnt.pendown()
 # def test(NeuralNet a):
 # 	global maxDistance
 # 	target=Point(math.floor(random.random()*100),math.floor(random.random()*100))
@@ -125,21 +129,42 @@ def reproduce(neuralNet1,neuralNet2):
 #-----CONSTANTS-------
 #instatiate 2 points and a vector between them as input
 point1=Point(4,2)
-point2=Point(20,50)
+point2=Point(100,127)
 inputs=point1.vector(point2)
-structure=[10,7,2]
-genSize=7
+structure=[15,20,2]
+genSize=100
 maxGens=100
-culledGenSize=2
+culledGenSize=5
 done=False
 j=0
 maxDistance=2
+
+#----Setting up turtle-----
+
+window=turtle.Screen()
+turnt=turtle.Turtle()
+turnt.speed(10)
+turnt.pensize(8)
+turnt.penup()
+turnt.shape("blank")
+turnt.goto(point1.x,point1.y)
+turnt.dot(15,"green")
+turnt.goto(point2.x,point2.y)
+turnt.dot(15,"red")
+turnt.goto(point1.x,point1.y)
+turnt.pendown()
+
 gen1=generate(genSize,structure)
 while(done==False and j<maxGens):
 	j=j+1
 	gen1=cullTheWeak(gen1,culledGenSize)
-	
-	if(gen1[0].fitness>.05):
+	#turtle stuff
+	turnt.forward(gen1[0].output[0])
+	turnt.left(90)
+	turnt.forward(gen1[0].output[1])
+	time.sleep(.15)
+	reset()
+	if(gen1[0].fitness<5):
 		done=True
 		break;
 	print(gen1[0].fitness)
@@ -160,6 +185,8 @@ while(done==False and j<maxGens):
 		gen1.pop(len(gen1)-1)
 
 print(gen1[0].fitness)
+turnt.forward(gen1[0].output[0])
+turnt.left(90)
+turnt.forward(gen1[0].output[1])
 
-
-
+window.mainloop()
