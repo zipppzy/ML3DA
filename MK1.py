@@ -5,6 +5,7 @@ import unittest
 import turtle
 import time
 from operator import attrgetter
+#represents one neuron in a neural network
 class Neuron:
 	def __init__(self,inputs):
 		#make the weights
@@ -19,6 +20,7 @@ class Neuron:
 		self.activation=self.sum
 	def setWeights(self,weights):
 		self.inputWeights=weights
+#represents multiple neurons
 class Layer:
 	def __init__(self,i,nN):
 		self.layerArr=[]
@@ -40,7 +42,7 @@ class Layer:
 		for i in range(len(self.layerArr)):
 			self.layerArr[i].setWeights=w[i]
 
-
+#represents multiple layers. Is tested to get fitness
 class NeuralNet:
 
 	#netStructArr is a a array with number of layers and number of nuerons per layer
@@ -69,12 +71,12 @@ class NeuralNet:
 		#	i.setWeights(w)
 	
 		
-
+#a point with x and y coordinates
 class Point:
 	def __init__(self,x,y):
 		self.x=x
 		self.y=y
-		# returns a vector between two points with distance then angle  
+	# returns a vector between two points with distance then angle  
 	def vector(self,a):
 		v=[]
 		v.append(math.sqrt(((a.x-self.x)**2)+((a.y-self.y)**2)))
@@ -87,6 +89,7 @@ def generate(numInd,netStruct):
 	for i in range(numInd):
 		generation.append(NeuralNet(inputs,netStruct))
 	return generation
+#sorts a generation on the basis of fitness
 def cullTheWeak(gen,surviorNum):
 	culledGen=sorted(gen,key=attrgetter('fitness'))
 	culledGen=culledGen[:surviorNum]
@@ -94,6 +97,7 @@ def cullTheWeak(gen,surviorNum):
 	return culledGen
 
 #return 4 weights for neural Nets
+#right now is broken
 def reproduce(neuralNet1,neuralNet2):
 	randVal=math.floor(random.random()*(len(neuralNet1.weights)))
 	piece1=neuralNet1.weights[:randVal]
@@ -101,7 +105,7 @@ def reproduce(neuralNet1,neuralNet2):
 	piece3=neuralNet2.weights[:randVal]
 	piece4=neuralNet2.weights[randVal:len(neuralNet1.weights)]
 	return [piece1+piece4,piece2+piece3]
-
+#turtle stuff that will be removed later so wont bother to explain it
 def reset():
 	global turnt
 	turnt.reset()
@@ -131,16 +135,21 @@ def reset():
 point1=Point(4,2)
 point2=Point(100,127)
 inputs=point1.vector(point2)
+#this indicates how many layers and how many neruons are in each layer in the neural network
 structure=[15,20,2]
+#how large the unculled generation is
 genSize=100
+#how many generations to go before stopping
 maxGens=100
+#how many individuals to keep after culling
 culledGenSize=5
+#just ways to end the loop
 done=False
 j=0
+#max distance from point 2 that can be called a sucess
 maxDistance=2
 
 #----Setting up turtle-----
-
 window=turtle.Screen()
 turnt=turtle.Turtle()
 turnt.speed(10)
@@ -154,6 +163,7 @@ turnt.dot(15,"red")
 turnt.goto(point1.x,point1.y)
 turnt.pendown()
 
+#should put this all in a method at some point
 gen1=generate(genSize,structure)
 while(done==False and j<maxGens):
 	j=j+1
@@ -190,3 +200,11 @@ turnt.left(90)
 turnt.forward(gen1[0].output[1])
 
 window.mainloop()
+
+#------TODO LIST-------
+# 1) need to be able to change inputs
+# 2) change outputs to angle and foward backwards
+# 3) make reproduce work discretely
+# 4) add mutation
+
+#other stuff I can't remember
