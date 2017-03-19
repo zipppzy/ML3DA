@@ -209,4 +209,3 @@ window.mainloop()
 
 #other stuff I can't remember
 
-#s;dlkja;lkjfs
