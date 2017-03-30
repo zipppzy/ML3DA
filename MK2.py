@@ -29,3 +29,53 @@ class Neuron:
                 if (activation>=stepLimit):
                     return 1
                 else: return 0
+
+class Layer:
+    def __init__(self,numNeurons,numInputs,activationFunc,sigmoidConstant=1,stepLimit=0):
+        self.layer=[]
+        for in in range(numNeurons):
+            layer.append(Neuron(numInputs,activationFunc,sigmoidConstant,stepLimit))
+
+    def setWeights(self,weights):
+        if (len(weights)==len(self.layer)):
+            for i in range(len(self.layer)):
+                if(len(weights[i])==numInputs):
+                    layer[i].setWeights(weights[i])
+
+    def setActivationFunc(self,activationFunc):
+        for i in self.layer:
+            i.setActivationFunc(activationFunc)
+
+    def setSigmoidConstant(self,sigmoidConstant):
+        for i in self.layer:
+            i.setSigmoidConstant(sigmoidConstant)
+
+    def setStepLimit(self,stepLimit):
+        for i in self.layer:
+            i.setStepLimit(stepLimit)
+
+    def getOutput(self,in):
+        if(len(inputs)==self.numInputs):
+            output=[]
+            for i in layer:
+                output.append(i.getOutput(in))
+
+class NeuralNet:
+    def __init__(self,structure,numInputs,activationFunc,sigmoidConstant=1,stepLimit=0):
+        self.neuralNet=[]
+        self.neuralNet.append(Layer(structure[0],numInputs,activationFunc,sigmoidConstant,stepLimit))
+        for i in range(1,len(structure)):
+            self.neuralNet.append(Layer(structure[i],structure[i-1],activationFunc,sigmoidConstant,stepLimit))
+
+    def setWeights(self,weights):
+        if (len(weights)==len(neuralNet)):
+            for i in range(len(weights)):
+                if(len(weights[i])==len(neuralNet[i].layer):
+                   
+    
+            
+
+
+
+
+            
