@@ -54,7 +54,7 @@ class Layer:
         for i in self.layer:
             i.setStepLimit(stepLimit)
 
-    def getOutput(self,in):
+    def getOutput(self,inputs):
         if(len(inputs)==self.numInputs):
             output=[]
             for i in layer:
@@ -66,16 +66,18 @@ class NeuralNet:
         self.neuralNet.append(Layer(structure[0],numInputs,activationFunc,sigmoidConstant,stepLimit))
         for i in range(1,len(structure)):
             self.neuralNet.append(Layer(structure[i],structure[i-1],activationFunc,sigmoidConstant,stepLimit))
-
+    #finish this        
     def setWeights(self,weights):
         if (len(weights)==len(neuralNet)):
             for i in range(len(weights)):
                 if(len(weights[i])==len(neuralNet[i].layer):
-                   
-    
-            
 
-
+    def setActivationFunc(activationFunc):
+    	for i in self.neuralNet:
+    		i.setActivationFunc(activationFunc)
+   	def setSigmoidConstant(sigmoidConstant):
+   		for i in self.neuralNet:
+   			i.set.sigmoidConstant(sigmoidConstant)
 
 
             
