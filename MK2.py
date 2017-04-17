@@ -85,7 +85,11 @@ class NeuralNet:
             i.setsigmoidConstant(sigmoidConstant)
     def setStepLimit(self,stepLimit):
         for i in self.neuralNet:
-            i.setStepLimit(stepLimit)
+            i.setStepLimit(stepLimit) 
+                    
+                    
+                
+            
     def getOutput(self,inputs):
         if (len(inputs)==self.numInputs):
             tempIn=inputs
@@ -93,9 +97,18 @@ class NeuralNet:
                 tempIn=self.neuralNet[i].getOutput(tempIn)
             return tempIn
 
-#n=NeuralNet([3,3],1,"sum")
-#n.setWeights([[[1],[1],[1]],[[1,1,1],[1,1,1],[1,1,1]]])
-#print(n.getOutput([1]))
+n=NeuralNet([3,3],1,"sum")
+n.setWeights([[[1],[1],[1]],[[1,1,1],[1,1,1],[1,1,1]]])
+print(n.getWeights())
 
 
 
+class GenAlg(ABC):
+    def __init__(self,numGen,surviorNum,mutationChance,structure,numInputs,activationFunc,sigmoidConstant=1,stepLimit=0):
+        gen=[]
+        for i in range(numInd):
+            gen.append(NeuralNet(structure,numInputs,activationFunc,sigmoidConstant=1,stepLimit=0))
+        for i in gen:
+            for i in range(len(structure)):
+                
+            i.setWeights
