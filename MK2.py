@@ -121,14 +121,22 @@ class GenAlg(ABC):
 			i.setWeights(self.randomWeights())
 
 	#quite broken
-	def randomWeights(self):
-		#makes a list for each layer
-		weights=[[0]*len(self.structure)]
-		for i in range(len(weights)):
-			weights[i][0]=[]*self.structure
+##	def randomWeights(self):
+##		#makes a list for each layer
+##		weights=[[0]*len(self.structure)]
+##		#makes a list for each neuron
+##		for i in range(len(weights)):
+##			weights[i][0]=[]for j in range(self.structure[i])
+##                        for j in range(len(weights[i])):
+                                
+                                
 
-g=GenAlg(1,2,.1,.1,.1,[2,3],1,"sigmoid")
-for i in g.gen:
-	print(g.getWeights())
-
+##g=GenAlg(1,2,.1,.1,.1,[2,3],1,"sigmoid")
+##for i in g.gen:
+##	print(g.getWeights())
+a=[[]for i in range(5)]
+for i in range(len(a)):
+        for i in range
+        a[i].append([0])
+print(a)
 
