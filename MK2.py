@@ -114,7 +114,7 @@ class NeuralNet:
 class GenAlg(abc.ABC):
         
         
-        def __init__(self,numGens,numIndivs,crossoverRate,mutationRate,culledPercent,structure,numInputs,activationFunc,sigmoidConstant=1,stepLimit=0):
+        def __init__(self,numGens,numIndivs,mutationRate,culledPercent,structure,numInputs,activationFunc,crossoverRate=1,sigmoidConstant=1,stepLimit=0):
                 # GenAlg(1,2,.1,.1,.1,[2,3],1,"sigmoid")
                 self.numGens=numGens
                 self.numIndivs=numIndivs
@@ -123,6 +123,7 @@ class GenAlg(abc.ABC):
                 self.culledPercent=culledPercent
                 self.structure=structure
                 self.numInputs=numInputs
+                self.activationFunc=activationFunc
                 self.sigmoidConstant=sigmoidConstant
                 self.stepLimit=stepLimit
                 self.gen=[]
@@ -134,6 +135,7 @@ class GenAlg(abc.ABC):
                 for i in range(numGens):
                         self.cull()
                         self.reproduce()
+                        print(self.gen[0].fitness)
 
                 
 
@@ -169,33 +171,35 @@ class GenAlg(abc.ABC):
                         choice2=int(random.random()*culledNum)
                         while(choice2==choice1):
                                 choice2=int(random.random()*culledNum)
-                        children=self.crossover(self.gen[choice1].getWeights(),gen[choice2].getWeights())
+                        children=self.crossover(self.gen[choice1].getWeights(),self.gen[choice2].getWeights())
                         self.gen.append(NeuralNet(self.structure,self.numInputs,self.activationFunc,self.sigmoidConstant,self.stepLimit))
                         self.gen[len(self.gen)-1].setWeights(children[0])
+                        self.gen[len(self.gen)-1].fitness=self.fitnessFunction(self.gen[len(self.gen)-1])
                         self.gen.append(NeuralNet(self.structure,self.numInputs,self.activationFunc,self.sigmoidConstant,self.stepLimit))
                         self.gen[len(self.gen)-1].setWeights(children[1])
+                        self.gen[len(self.gen)-1].fitness=self.fitnessFunction(self.gen[len(self.gen)-1])
                 if(len(self.gen)>self.numIndivs):
                         del self.gen[len(self.gen)-1]
                 
         def crossover(self,A,B):
                 weightsA=self.threeDtoOneD(A)
-                weightsB=threeDtoOneD(B)
+                weightsB=self.threeDtoOneD(B)
                 cutPoint=int(random.random()*(len(weightsA)-1))+1
                 piece1A=weightsA[0:cutPoint]
                 piece2A=weightsA[cutPoint:len(weightsA)]
                 piece1B=weightsB[0:cutPoint]
                 piece2B=weightsB[cutPoint:len(weightsB)]
                 child1=piece1A+piece2B
-                child2=peice1B+piece2A
+                child2=piece1B+piece2A
                 for i in child1:
                         if(random.random()<self.mutationRate):
                                 i=random.random()
-                child2=peice1B+piece2A
+                child2=piece1B+piece2A
                 for i in child2:
                         if(random.random()<self.mutationRate):
                                 i=random.random()
-                child1=oneDtoThreeD(child1)
-                child2=oneDtoThreeD(child2)
+                child1=self.oneDtoThreeD(child1)
+                child2=self.oneDtoThreeD(child2)
                 return [child1,child2]
 
 
@@ -208,7 +212,7 @@ class GenAlg(abc.ABC):
                         for j in i:
                                 for k in j:
                                         one.append(k)
-                return b
+                return one
         def oneDtoThreeD(self,one):
                 oneCounter=0
                 three=[]
@@ -220,12 +224,12 @@ class GenAlg(abc.ABC):
                                 
                                 neuronWeights=[]
                                 if (i==0):
-                                        for i in range(self.numInputs):
+                                        for k in range(self.numInputs):
                                                 neuronWeights.append(one[oneCounter])
                                                 oneCounter+=1
                                                 
                                 elif(i>0):
-                                        for i in range (self.structure[i-1]):
+                                        for k in range (self.structure[i-1]):
                                                 neuronWeights.append(one[oneCounter])
                                                 oneCounter+=1
                                 three[i].append(neuronWeights)
@@ -238,11 +242,11 @@ class myGenAlg(GenAlg):
                 pointA=Point(random.random()*100,random.random()*100,random.random()*100)
                 #destination
                 pointB=Point(random.random()*100,random.random()*100,random.random()*100)
-
+                
                 while(pointA.distance(pointB)<10):
                         pointB=Point(random.random()*100,random.random()*100,random.random()*100)
                 count=0
-                while(pointA.distance(pointB)>2):
+                while(pointA.distance(pointB)>2 and count<1000):
                         #mebe want to change scaling
 
                         output=a.getOutput([((pointB.x-pointA.x)*100)-50,(pointB.y-pointA.y)*(2*math.pi),((pointB.z-pointA.z)*100)-50])
@@ -250,8 +254,8 @@ class myGenAlg(GenAlg):
                         pointA.y+=output[0]*math.sin(output[1])
                         pointA.z+=output[2]
                         count+=1
-                        print(pointA.distance(pointB))
-                print("count: "+count)
+                        #print(pointA.distance(pointB))
+                #print("count: "+count)
                 return -count
 
 
@@ -264,7 +268,7 @@ class Point():
         def distance(self,B):
                 return math.sqrt(((B.x-self.x)**2)+((B.y-self.y)**2)+((B.z-self.z)**2))
 #numGens,numIndivs,crossoverRate,mutationRate,culledPercent,structure,numInputs,activationFunc,sigmoidConstant=1,stepLimit=0
-g=myGenAlg(50,100,.1,.2,.1,[5,10,3],3,"sigmoid")
+g=myGenAlg(50,100,.05,.1,[5,5,3],3,"sigmoid")
 
 
 
