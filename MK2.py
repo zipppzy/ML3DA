@@ -3,6 +3,7 @@ import abc
 import random
 import operator
 from decimal import Decimal,getcontext
+import bpy
 
 class Neuron:
         def __init__(self,numInputs,activationFunc,sigmoidConstant=1,stepLimit=0):
@@ -115,6 +116,7 @@ class GenAlg(abc.ABC):
         
         
         def __init__(self,numGens,numIndivs,mutationRate,culledPercent,structure,numInputs,activationFunc,crossoverRate=1,sigmoidConstant=1,stepLimit=0):
+                global show
                 # GenAlg(1,2,.1,.1,.1,[2,3],1,"sigmoid")
                 self.numGens=numGens
                 self.numIndivs=numIndivs
@@ -136,12 +138,17 @@ class GenAlg(abc.ABC):
                         self.cull()
                         self.reproduce()
                         print(self.gen[0].fitness)
+                        if(i%10==0):
+                            show=True
+                            self.fitnessFunction(self.gen[0])
+                            show=False
+                        
 
                 
 
         def randomWeights(self):
                 weights=[]
-                for i in range(len(self.structure)):
+                for i in range(len(self.structure)): 
                         weights.append([])
                 for i in range(len(self.structure)):
                         for j in range(self.structure[i]):
@@ -238,22 +245,27 @@ class myGenAlg(GenAlg):
         #input is cartesian[x,y,z] output is cylindrical[r,theta,z] http://electron9.phys.utk.edu/vectors/3dcoordinates.htm
 
         def fitnessFunction(self,a):
+                global show
                 #moves
-                pointA=Point(random.random()*100,random.random()*100,random.random()*100)
+                pointA=Point(random.random()*10,random.random()*10,random.random()*10)
                 #destination
-                pointB=Point(random.random()*100,random.random()*100,random.random()*100)
+                pointB=Point(random.random()*10,random.random()*10,random.random()*10)
                 
-                while(pointA.distance(pointB)<10):
+                while(pointA.distance(pointB)<20):
                         pointB=Point(random.random()*100,random.random()*100,random.random()*100)
                 count=0
-                while(pointA.distance(pointB)>2 and count<1000):
+                while(pointA.distance(pointB)>10 and count<1000):
+                        global show
+                        startPoint=pointA
                         #mebe want to change scaling
-
                         output=a.getOutput([((pointB.x-pointA.x)*100)-50,(pointB.y-pointA.y)*(2*math.pi),((pointB.z-pointA.z)*100)-50])
                         pointA.x+=output[0]*math.cos(output[1])
                         pointA.y+=output[0]*math.sin(output[1])
                         pointA.z+=output[2]
                         count+=1
+                        if(show and count<30):
+                            visualize(startPoint,pointB,pointA)
+                            print("animating")
                         #print(pointA.distance(pointB))
                 #print("count: "+count)
                 return -count
@@ -267,10 +279,27 @@ class Point():
                 self.z=z
         def distance(self,B):
                 return math.sqrt(((B.x-self.x)**2)+((B.y-self.y)**2)+((B.z-self.z)**2))
+def visualize(startPos,goalPos,movePos):
+    global currentFrame
+    start=bpy.data.objects["Start"]
+    goal=bpy.data.objects["Goal"]
+    start.location=(startPos.x,startPos.y,startPos.z)
+    goal.location=(goalPos.x,goalPos.y,goalPos.z)
+    start.keyframe_insert(data_path="location",frame=currentFrame)
+    start.location=(movePos.x,movePos.y,movePos.z)
+    currentFrame+=10
+    start.keyframe_insert(data_path="location",frame=currentFrame)
+def reset():
+    bpy.data.objects["Start"].animation_data_clear()
+
+print("start")
+currentFrame=1
+show=False
+reset()
 #numGens,numIndivs,crossoverRate,mutationRate,culledPercent,structure,numInputs,activationFunc,sigmoidConstant=1,stepLimit=0
-g=myGenAlg(50,100,.05,.1,[5,5,3],3,"sigmoid")
-
-
+g=myGenAlg(20,50,.05,.1,[3,5,3],3,"sigmoid")
+print("end")
+#visualize(Point(0,0,0),Point(5,5,5),Point(-5,0,5))
 
 
 
