@@ -2,8 +2,8 @@ import math
 import abc
 import random
 import operator
-from decimal import Decimal,getcontext
-import bpy
+#from decimal import Decimal,getcontext
+#import bpy
 
 class Neuron:
         def __init__(self,numInputs,activationFunc,sigmoidConstant=1,stepLimit=0):
@@ -22,7 +22,6 @@ class Neuron:
         def setStepLimit(self,stepLimit):
                 self.stepLimit=stepLimit
         def getOutput(self,inputs):
-                getcontext().prec=100
                 if(len(inputs)==self.numInputs and len(self.weights)>0):
                         activation=0
                         for i in range(self.numInputs):
@@ -246,26 +245,31 @@ class myGenAlg(GenAlg):
 
         def fitnessFunction(self,a):
                 global show
+                global file
                 #moves
                 pointA=Point(random.random()*10,random.random()*10,random.random()*10)
                 #destination
                 pointB=Point(random.random()*10,random.random()*10,random.random()*10)
                 
-                while(pointA.distance(pointB)<20):
-                        pointB=Point(random.random()*100,random.random()*100,random.random()*100)
+                while(pointA.distance(pointB)<2):
+                        pointB=Point(random.random()*10,random.random()*10,random.random()*10)
                 count=0
-                while(pointA.distance(pointB)>10 and count<1000):
-                        global show
+                while(pointA.distance(pointB)>1 and count<1000):
+                        
+                        
                         startPoint=pointA
                         #mebe want to change scaling
-                        output=a.getOutput([((pointB.x-pointA.x)*100)-50,(pointB.y-pointA.y)*(2*math.pi),((pointB.z-pointA.z)*100)-50])
+                        output=a.getOutput([((pointB.x-pointA.x)*10)-5,(pointB.y-pointA.y)*(2*math.pi),((pointB.z-pointA.z)*10)-5])
                         pointA.x+=output[0]*math.cos(output[1])
                         pointA.y+=output[0]*math.sin(output[1])
                         pointA.z+=output[2]
                         count+=1
                         if(show and count<30):
-                            visualize(startPoint,pointB,pointA)
-                            print("animating")
+                                    
+                                    file.write(str(startPoint.x)+","+str(startPoint.y)+","+str(startPoint.z)+","+str(pointB.x)+","+str(pointB.y)+","+str(pointB.z)+","+str(pointA.x)+","+str(pointA.y)+","+str(pointA.z)+",")
+                            
+                                    #visualize(startPoint,pointB,pointA)
+                                    print("animating")
                         #print(pointA.distance(pointB))
                 #print("count: "+count)
                 return -count
@@ -279,25 +283,29 @@ class Point():
                 self.z=z
         def distance(self,B):
                 return math.sqrt(((B.x-self.x)**2)+((B.y-self.y)**2)+((B.z-self.z)**2))
-def visualize(startPos,goalPos,movePos):
-    global currentFrame
-    start=bpy.data.objects["Start"]
-    goal=bpy.data.objects["Goal"]
-    start.location=(startPos.x,startPos.y,startPos.z)
-    goal.location=(goalPos.x,goalPos.y,goalPos.z)
-    start.keyframe_insert(data_path="location",frame=currentFrame)
-    start.location=(movePos.x,movePos.y,movePos.z)
-    currentFrame+=10
-    start.keyframe_insert(data_path="location",frame=currentFrame)
-def reset():
-    bpy.data.objects["Start"].animation_data_clear()
+##def visualize(startPos,goalPos,movePos):
+##    global currentFrame
+##    start=bpy.data.objects["Start"]
+##    goal=bpy.data.objects["Goal"]
+##    start.location=(startPos.x,startPos.y,startPos.z)
+##    goal.location=(goalPos.x,goalPos.y,goalPos.z)
+##    start.keyframe_insert(data_path="location",frame=currentFrame)
+##    start.location=(movePos.x,movePos.y,movePos.z)
+##    currentFrame+=10
+##    start.keyframe_insert(data_path="location",frame=currentFrame)
+##def reset():
+##    bpy.data.objects["Start"].animation_data_clear()
 
 print("start")
-currentFrame=1
+#currentFrame=1
+open("animationEncoding.txt","w").close()
+file=open("animationEncoding.txt","a")
 show=False
-reset()
+
+#reset()
 #numGens,numIndivs,crossoverRate,mutationRate,culledPercent,structure,numInputs,activationFunc,sigmoidConstant=1,stepLimit=0
-g=myGenAlg(20,50,.05,.1,[3,5,3],3,"sigmoid")
+g=myGenAlg(100,50,.05,.1,[3,5,3],3,"sigmoid")
+file.close()
 print("end")
 #visualize(Point(0,0,0),Point(5,5,5),Point(-5,0,5))
 
